@@ -106,7 +106,7 @@ func TestTransferNonExistentAccounts(t *testing.T) {
 	repo := repository.NewInMemoryRepository()
 	service := NewAccountService(repo)
 
-	_, err := service.Transfer("123", "456", 100)
+	_, _, err := service.Transfer("123", "456", 100)
 	if err == nil {
 		t.Errorf("Expected error transferring")
 	}
@@ -121,7 +121,7 @@ func TestTransferNonExistentOriginAccount(t *testing.T) {
 		t.Errorf("Expected no error depositing: %v", err)
 	}
 
-	_, err = service.Transfer("123", "456", 100)
+	_, _, err = service.Transfer("123", "456", 100)
 	if err == nil {
 		t.Errorf("Expected error transferring")
 	}
@@ -136,7 +136,7 @@ func TestTransferNonExistentDestinationAccount(t *testing.T) {
 		t.Errorf("Expected no error depositing: %v", err)
 	}
 
-	_, err = service.Transfer("123", "456", 100)
+	_, _, err = service.Transfer("123", "456", 100)
 	if err == nil {
 		t.Errorf("Expected error transferring")
 	}
@@ -156,26 +156,22 @@ func TestTransfer(t *testing.T) {
 		t.Errorf("Expected no error depositing: %v", err)
 	}
 
-	account, err := service.Transfer("123", "456", 100)
+	originAccount, destinationAccount, err := service.Transfer("123", "456", 100)
 	if err != nil {
 		t.Errorf("Expected no error transferring: %v", err)
 	}
-	if account == nil {
-		t.Errorf("Expected non-nil account")
+	if originAccount == nil {
+		t.Errorf("Expected non-nil origin account")
 	}
-	if account.ID != "123" {
-		t.Errorf("Expected account ID to be 123")
+	if originAccount.ID != "123" {
+		t.Errorf("Expected origin account ID to be 123")
 	}
-	if account.Balance != 0 {
-		t.Errorf("Expected account balance to be 0")
+	if originAccount.Balance != 0 {
+		t.Errorf("Expected origin account balance to be 0")
 	}
 
-	destinationAccount, err := service.GetBalance("456")
-	if err != nil {
-		t.Errorf("Expected no error getting balance: %v", err)
-	}
-	if destinationAccount != 200 {
-		t.Errorf("Expected account balance to be 200")
+	if destinationAccount.Balance != 200 {
+		t.Errorf("Expected destination account balance to be 200")
 	}
 }
 
@@ -193,7 +189,7 @@ func TestTransferInsufficientFunds(t *testing.T) {
 		t.Errorf("Expected no error depositing: %v", err)
 	}
 
-	_, err = service.Transfer("123", "456", 200)
+	_, _, err = service.Transfer("123", "456", 200)
 	if err == nil {
 		t.Errorf("Expected error transferring")
 	}

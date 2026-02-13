@@ -5,11 +5,11 @@ type Account struct {
 	Balance int    `json:"balance"`
 }
 
-type AccountUseCase interface {
+type AccountService interface {
 	GetBalance(id string) (int, error)
 	Deposit(id string, amount int) (*Account, error)
 	Withdraw(id string, amount int) (*Account, error)
-	Transfer(originID, destinationID string, amount int) (*Account, error)
+	Transfer(originID, destinationID string, amount int) (origin, destination *Account, err error)
 	Reset() error
 }
 

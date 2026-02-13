@@ -57,37 +57,37 @@ func (s *AccountService) Withdraw(accountID string, amount int) (*domain.Account
 	return s.repo.Upsert(account)
 }
 
-func (s *AccountService) Transfer(originID, destinationID string, amount int) (*domain.Account, error) {
+func (s *AccountService) Transfer(originID, destinationID string, amount int) (*domain.Account, *domain.Account, error) {
 	originAccount, err := s.repo.FindByID(originID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if originAccount == nil {
-		return nil, fmt.Errorf("Origin account not found")
+		return nil, nil, fmt.Errorf("Origin account not found")
 	}
 	if originAccount.Balance < amount {
-		return nil, fmt.Errorf("Insufficient funds")
+		return nil, nil, fmt.Errorf("Insufficient funds")
 	}
 	originAccount.Balance -= amount
 
 	destinationAccount, err := s.repo.FindByID(destinationID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if destinationAccount == nil {
-		return nil, fmt.Errorf("Destination account not found")
+		return nil, nil, fmt.Errorf("Destination account not found")
 	}
 	destinationAccount.Balance += amount
 
 	originAccount, err = s.repo.Upsert(originAccount)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	destinationAccount, err = s.repo.Upsert(destinationAccount)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return originAccount, nil
+	return originAccount, destinationAccount, nil
 }
 
 func (s *AccountService) Reset() error {
