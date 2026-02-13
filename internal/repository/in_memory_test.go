@@ -75,3 +75,35 @@ func TestExistentAccount(t *testing.T) {
 		t.Errorf("Expected account balance to be 100")
 	}
 }
+
+func TestUpdateAccount(t *testing.T) {
+	repo := NewInMemoryRepository()
+
+	account, err := repo.Upsert(&domain.Account{
+		ID:      "123",
+		Balance: 100,
+	})
+
+	if err != nil {
+		t.Errorf("Expected no error creating account: %v", err)
+	}
+	account.Balance = 200
+
+	account, err = repo.Upsert(account)
+
+	if err != nil {
+		t.Errorf("Expected no error updating account: %v", err)
+	}
+
+	if account == nil {
+		t.Errorf("Expected non-nil account")
+	}
+
+	if account.ID != "123" {
+		t.Errorf("Expected account ID to be 123")
+	}
+
+	if account.Balance != 200 {
+		t.Errorf("Expected account balance to be 200")
+	}
+}
