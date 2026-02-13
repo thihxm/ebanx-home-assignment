@@ -2,12 +2,14 @@ package repository
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/thihxm/ebanx-home-assignment/internal/domain"
 )
 
 type InMemoryRepository struct {
 	accounts map[string]*domain.Account
+	mu       sync.RWMutex
 }
 
 func NewInMemoryRepository() *InMemoryRepository {
@@ -17,11 +19,23 @@ func NewInMemoryRepository() *InMemoryRepository {
 }
 
 func (r *InMemoryRepository) FindByID(id string) (*domain.Account, error) {
-	return nil, fmt.Errorf("Not implemented")
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	account, ok := r.accounts[id]
+	if !ok {
+		return nil, nil
+	}
+	return account, nil
 }
 
 func (r *InMemoryRepository) Upsert(account *domain.Account) (*domain.Account, error) {
-	return nil, fmt.Errorf("Not implemented")
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.accounts[account.ID] = account
+
+	return account, nil
 }
 
 func (r *InMemoryRepository) Reset() error {
