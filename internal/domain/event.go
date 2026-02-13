@@ -1,10 +1,10 @@
 package domain
 
 type EventRequest struct {
-	Type        string `json:"type"`
-	Origin      string `json:"origin,omitempty"`
-	Destination string `json:"destination,omitempty"`
-	Amount      int    `json:"amount"`
+	Type        string `json:"type" validate:"required,oneof=deposit withdraw transfer"`
+	Origin      string `json:"origin,omitempty" validate:"omitempty,required_if=Type withdraw,required_if=Type transfer,numeric"`
+	Destination string `json:"destination,omitempty" validate:"omitempty,required_if=Type deposit,required_if=Type transfer,numeric"`
+	Amount      int    `json:"amount" validate:"required,gt=0"`
 }
 
 type EventResponse struct {
