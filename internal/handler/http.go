@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/thihxm/ebanx-home-assignment/internal/domain"
@@ -33,6 +34,7 @@ func (h *HTTPHandler) handleReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "OK")
 }
 
 func (h *HTTPHandler) handleEvent(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +45,8 @@ func (h *HTTPHandler) handleEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := h.eventService.ProcessEvent(req)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "0")
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -73,6 +76,8 @@ func (h *HTTPHandler) Serve(addr string) error {
 		Addr:    addr,
 		Handler: mux,
 	}
+
+	log.Printf("Server started on %s", addr)
 
 	return server.ListenAndServe()
 }
