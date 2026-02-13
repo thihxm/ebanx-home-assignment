@@ -17,21 +17,79 @@ func NewAccountService(repo domain.AccountRepository) *AccountService {
 }
 
 func (s *AccountService) GetBalance(accountID string) (int, error) {
-	return 0, fmt.Errorf("Not implemented")
+	account, err := s.repo.FindByID(accountID)
+	if err != nil {
+		return 0, err
+	}
+	if account == nil {
+		return 0, fmt.Errorf("Account not found")
+	}
+	return account.Balance, nil
 }
 
 func (s *AccountService) Deposit(accountID string, amount int) (*domain.Account, error) {
-	return nil, fmt.Errorf("Not implemented")
+	account, err := s.repo.FindByID(accountID)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil {
+		account = &domain.Account{
+			ID:      accountID,
+			Balance: 0,
+		}
+	}
+	account.Balance += amount
+	return s.repo.Upsert(account)
 }
 
 func (s *AccountService) Withdraw(accountID string, amount int) (*domain.Account, error) {
-	return nil, fmt.Errorf("Not implemented")
+	account, err := s.repo.FindByID(accountID)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil {
+		return nil, fmt.Errorf("Account not found")
+	}
+	if account.Balance < amount {
+		return nil, fmt.Errorf("Insufficient funds")
+	}
+	account.Balance -= amount
+	return s.repo.Upsert(account)
 }
 
 func (s *AccountService) Transfer(originID, destinationID string, amount int) (*domain.Account, error) {
-	return nil, fmt.Errorf("Not implemented")
+	originAccount, err := s.repo.FindByID(originID)
+	if err != nil {
+		return nil, err
+	}
+	if originAccount == nil {
+		return nil, fmt.Errorf("Origin account not found")
+	}
+	if originAccount.Balance < amount {
+		return nil, fmt.Errorf("Insufficient funds")
+	}
+	originAccount.Balance -= amount
+
+	destinationAccount, err := s.repo.FindByID(destinationID)
+	if err != nil {
+		return nil, err
+	}
+	if destinationAccount == nil {
+		return nil, fmt.Errorf("Destination account not found")
+	}
+	destinationAccount.Balance += amount
+
+	originAccount, err = s.repo.Upsert(originAccount)
+	if err != nil {
+		return nil, err
+	}
+	destinationAccount, err = s.repo.Upsert(destinationAccount)
+	if err != nil {
+		return nil, err
+	}
+	return originAccount, nil
 }
 
 func (s *AccountService) Reset() error {
-	return fmt.Errorf("Not implemented")
+	return s.repo.Reset()
 }
