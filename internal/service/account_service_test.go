@@ -136,9 +136,19 @@ func TestTransferNonExistentDestinationAccount(t *testing.T) {
 		t.Errorf("Expected no error depositing: %v", err)
 	}
 
-	_, _, err = service.Transfer("123", "456", 100)
-	if err == nil {
-		t.Errorf("Expected error transferring")
+	_, destinationAccount, err := service.Transfer("123", "456", 100)
+	if err != nil {
+		t.Errorf("Expected no error transferring: %v", err)
+	}
+
+	if destinationAccount == nil {
+		t.Errorf("Expected non-nil destination account")
+	}
+	if destinationAccount.ID != "456" {
+		t.Errorf("Expected destination account ID to be 456")
+	}
+	if destinationAccount.Balance != 100 {
+		t.Errorf("Expected destination account balance to be 100")
 	}
 }
 

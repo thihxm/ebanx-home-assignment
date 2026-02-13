@@ -75,7 +75,10 @@ func (s *AccountService) Transfer(originID, destinationID string, amount int) (*
 		return nil, nil, err
 	}
 	if destinationAccount == nil {
-		return nil, nil, fmt.Errorf("Destination account not found")
+		destinationAccount = &domain.Account{
+			ID:      destinationID,
+			Balance: 0,
+		}
 	}
 	destinationAccount.Balance += amount
 
