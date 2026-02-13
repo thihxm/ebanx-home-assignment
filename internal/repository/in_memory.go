@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/thihxm/ebanx-home-assignment/internal/domain"
@@ -39,5 +38,9 @@ func (r *InMemoryRepository) Upsert(account *domain.Account) (*domain.Account, e
 }
 
 func (r *InMemoryRepository) Reset() error {
-	return fmt.Errorf("Not implemented")
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.accounts = make(map[string]*domain.Account)
+	return nil
 }
