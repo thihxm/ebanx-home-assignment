@@ -16,7 +16,7 @@ func NewEventService(accountService domain.AccountService) *EventService {
 	}
 }
 
-func (s *EventService) HandleEvent(event domain.EventRequest) (*domain.EventResponse, error) {
+func (s *EventService) ProcessEvent(event domain.EventRequest) (*domain.EventResponse, error) {
 	switch event.Type {
 	case "deposit":
 		account, err := s.accountService.Deposit(event.Origin, event.Amount)

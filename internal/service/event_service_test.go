@@ -12,7 +12,7 @@ func TestHandleDepositEvent(t *testing.T) {
 	accountService := NewAccountService(repo)
 	eventService := NewEventService(accountService)
 
-	_, err := eventService.HandleEvent(domain.EventRequest{
+	_, err := eventService.ProcessEvent(domain.EventRequest{
 		Type:   "deposit",
 		Origin: "123",
 		Amount: 100,
@@ -29,7 +29,7 @@ func TestHandleWithdrawEvent(t *testing.T) {
 
 	accountService.Deposit("123", 100)
 
-	_, err := eventService.HandleEvent(domain.EventRequest{
+	_, err := eventService.ProcessEvent(domain.EventRequest{
 		Type:   "withdraw",
 		Origin: "123",
 		Amount: 100,
@@ -47,7 +47,7 @@ func TestHandleTransferEvent(t *testing.T) {
 	accountService.Deposit("123", 100)
 	accountService.Deposit("456", 0)
 
-	_, err := eventService.HandleEvent(domain.EventRequest{
+	_, err := eventService.ProcessEvent(domain.EventRequest{
 		Type:        "transfer",
 		Origin:      "123",
 		Destination: "456",
